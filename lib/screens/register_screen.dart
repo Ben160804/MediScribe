@@ -1,12 +1,42 @@
 import 'package:aignite2025_oops/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../controllers/page_controllers/register_page_controller.dart';
 
 class RegisterScreen extends StatelessWidget {
   RegisterScreen({super.key});
 
   final registerController = Get.find<RegisterController>();
+
+  // Translations for English and Bengali
+  final Map<String, String> en = {
+    'register': 'Register',
+    'fullName': 'Full Name',
+    'email': 'Email',
+    'phone': 'Phone',
+    'age': 'Age',
+    'password': 'Password',
+    'alreadyHaveAccount': 'Already have an account? Login Now',
+    'registerButton': 'REGISTER',
+  };
+
+  final Map<String, String> bn = {
+    'register': 'নিবন্ধন করুন',
+    'fullName': 'পূর্ণ নাম',
+    'email': 'ইমেইল',
+    'phone': 'ফোন',
+    'age': 'বয়স',
+    'password': 'পাসওয়ার্ড',
+    'alreadyHaveAccount': 'আগেই অ্যাকাউন্ট আছে? লগইন করুন',
+    'registerButton': 'নিবন্ধন করুন',
+  };
+
+  // Function to get the translated text based on language preference
+  String translate(String key) {
+    String selectedLang = GetStorage().read('language') ?? 'en';  // Default to 'en'
+    return selectedLang == 'bn' ? bn[key] ?? key : en[key] ?? key;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +83,9 @@ class RegisterScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        const Text(
-                          "Register",
-                          style: TextStyle(
+                        Text(
+                          translate("register"),  // Use translated text here
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF6A1B9A),
@@ -66,7 +96,7 @@ class RegisterScreen extends StatelessWidget {
                         // Full Name
                         TextField(
                           decoration: InputDecoration(
-                            hintText: "Full Name",
+                            hintText: translate("fullName"),  // Use translated text here
                             prefixIcon: const Icon(Icons.person),
                             filled: true,
                             fillColor: const Color(0xFFF4F4F4),
@@ -82,7 +112,7 @@ class RegisterScreen extends StatelessWidget {
                         // Email
                         TextField(
                           decoration: InputDecoration(
-                            hintText: "Email",
+                            hintText: translate("email"),  // Use translated text here
                             prefixIcon: const Icon(Icons.email),
                             filled: true,
                             fillColor: const Color(0xFFF4F4F4),
@@ -99,7 +129,7 @@ class RegisterScreen extends StatelessWidget {
                         TextField(
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
-                            hintText: "Phone",
+                            hintText: translate("phone"),  // Use translated text here
                             prefixIcon: const Icon(Icons.phone),
                             filled: true,
                             fillColor: const Color(0xFFF4F4F4),
@@ -116,7 +146,7 @@ class RegisterScreen extends StatelessWidget {
                         TextField(
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            hintText: "Age",
+                            hintText: translate("age"),  // Use translated text here
                             prefixIcon: const Icon(Icons.cake),
                             filled: true,
                             fillColor: const Color(0xFFF4F4F4),
@@ -133,7 +163,7 @@ class RegisterScreen extends StatelessWidget {
                         TextField(
                           obscureText: true,
                           decoration: InputDecoration(
-                            hintText: "Password",
+                            hintText: translate("password"),  // Use translated text here
                             prefixIcon: const Icon(Icons.lock),
                             filled: true,
                             fillColor: const Color(0xFFF4F4F4),
@@ -164,15 +194,16 @@ class RegisterScreen extends StatelessWidget {
                                 ? const CircularProgressIndicator(
                               color: Colors.white,
                             )
-                                : const Text(
-                              "REGISTER",
-                              style: TextStyle(
+                                : Text(
+                              translate("registerButton"),  // Use translated text here
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
                           ),
                         )),
+
                       ],
                     ),
                   ),
@@ -184,9 +215,9 @@ class RegisterScreen extends StatelessWidget {
                     onPressed: () {
                       Get.to(LoginScreen());
                     },
-                    child: const Text(
-                      "Already have an account? Login Now",
-                      style: TextStyle(
+                    child: Text(
+                      translate("alreadyHaveAccount"),  // Use translated text here
+                      style: const TextStyle(
                         color: Color(0xFF6A1B9A),
                         fontSize: 14,
                       ),
