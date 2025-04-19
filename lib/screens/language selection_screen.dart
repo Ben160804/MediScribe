@@ -56,24 +56,26 @@ class LanguageScreen extends StatelessWidget {
               ),
 
               // Continue Button
-              Obx(() => controller.selectedLanguage.isNotEmpty
-                  ? Center(
-                child: ElevatedButton.icon(
-                  onPressed: controller.proceed,
-                  icon: const Icon(Icons.arrow_forward),
-                  label: Text('continue'.tr),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              Obx(() {
+                return controller.selectedLanguage.isNotEmpty
+                    ? Center(
+                  child: ElevatedButton.icon(
+                    onPressed: controller.proceed,
+                    icon: const Icon(Icons.arrow_forward),
+                    label: Text('continue'.tr),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
-                ),
-              )
-                  : const SizedBox.shrink()),
+                )
+                    : const SizedBox.shrink();
+              }),
             ],
           ),
         ),

@@ -1,7 +1,9 @@
+import 'package:aignite2025_oops/screens/language%20selection_screen.dart';
+import 'package:aignite2025_oops/screens/onboarding_screeen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'package:get_storage/get_storage.dart';
 import 'firebase_options.dart';
 import 'translation/app_translations.dart';
 
@@ -9,8 +11,7 @@ import 'translation/app_translations.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
-import 'screens/onboarding_screeen.dart';
-import 'screens/language selection_screen.dart';
+  // Fixed typo in the screen name
 
 // Controllers
 import 'controllers/component_controllers/pdf_controller.dart';
@@ -24,6 +25,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize GetStorage before running the app
+  await GetStorage.init();
 
   // Register global controllers
   Get.put(PdfController());
@@ -43,18 +47,19 @@ class MyApp extends StatelessWidget {
     final LanguageController langController = Get.find();
 
     return Obx(() {
+      // Ensure the language is set properly when the app is launched
       return GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'MediScribe',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),
-        translations: AppTranslations(),                     // 🌐 i18n map
+        translations: AppTranslations(),  // i18n map
         locale: langController.selectedLanguage.isNotEmpty
             ? Locale(langController.selectedLanguage.value)  // dynamically set
-            : const Locale('en'),                             // fallback
+            : const Locale('en'),  // fallback
         fallbackLocale: const Locale('en'),
-        initialRoute: '/language',                            // 🔑 Initial screen
+        initialRoute: '/language',  // Initial screen for language selection
         getPages: [
           GetPage(name: '/language', page: () => LanguageScreen()),
           GetPage(name: '/onboarding', page: () => OnboardingScreen()),
@@ -63,6 +68,6 @@ class MyApp extends StatelessWidget {
           GetPage(name: '/register', page: () => RegisterScreen()),
         ],
       );
-      });
-    }
+    });
+  }
 }
