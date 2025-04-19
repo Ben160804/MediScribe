@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../api/auth_api_service.dart';
+import '../../api/translater_api_service.dart';
 
 
 class LoginController extends GetxController {
@@ -25,7 +26,8 @@ class LoginController extends GetxController {
         email: email.value.trim(),
         password: password.value,
       );
-
+    /*  String test = await  TranslationService().translate('home','bn');
+      print('test: ${test}');*/
       // 3) On success
       isLoading.value = false;
       Get.snackbar('Welcome', 'Logged in as ${user.email}');

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:io';
+import '../api/img_upload_api.dart';
 import '/controllers/component_controllers/image_controller.dart';
+
 
 class ImagePreviewScreen extends StatelessWidget {
   ImagePreviewScreen({super.key});
 
   final imageController = Get.find<ImageController>();
+  final apiService = ApiService();
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +61,20 @@ class ImagePreviewScreen extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    // TODO: Trigger image analysis
+                  onPressed: () async {
                     print("Analyzing image...");
+                    final file = imageController.selectedImage.value;
+                    if (file != null) {
+                      final response = await apiService.uploadImage(file);
+                      if (response != null) {
+                        Get.snackbar("Success", "Image processed successfully!",
+                            snackPosition: SnackPosition.BOTTOM);
+                        print("Response: ${response.body}");
+                      } else {
+                        Get.snackbar("Error", "Failed to process image.",
+                            snackPosition: SnackPosition.BOTTOM);
+                      }
+                    }
                   },
                   icon: const Icon(Icons.analytics),
                   label: const Text(
