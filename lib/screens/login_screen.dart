@@ -1,4 +1,3 @@
-import 'package:aignite2025_oops/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/page_controllers/login_page_controller.dart';
@@ -7,6 +6,27 @@ class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
   final loginController = Get.find<LoginController>();
+
+  // Translations directly inside the LoginScreen
+  final Map<String, String> en = {
+    'login': 'Login',
+    'username': 'Username',
+    'password': 'Password',
+    'notRegistered': 'Not yet registered? SignUp Now',
+  };
+
+  final Map<String, String> bn = {
+    'login': 'লগইন',
+    'username': 'ইউজারনেম',
+    'password': 'পাসওয়ার্ড',
+    'notRegistered': 'এখনও নিবন্ধিত নয়? এখনই সাইনআপ করুন',
+  };
+
+  // Function to get the translation based on the selected language
+  String translate(String key) {
+    String selectedLang = Get.locale?.languageCode ?? 'en';  // Default to 'en'
+    return selectedLang == 'bn' ? bn[key] ?? key : en[key] ?? key;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +73,9 @@ class LoginScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        const Text(
-                          "Login",
-                          style: TextStyle(
+                        Text(
+                          translate("login"), // Use translated text here
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF6A1B9A),
@@ -66,7 +86,7 @@ class LoginScreen extends StatelessWidget {
                         // Username
                         TextField(
                           decoration: InputDecoration(
-                            hintText: "Username",
+                            hintText: translate("username"), // Use translated text here
                             prefixIcon: const Icon(Icons.person_outline),
                             filled: true,
                             fillColor: const Color(0xFFF4F4F4),
@@ -87,7 +107,7 @@ class LoginScreen extends StatelessWidget {
                         TextField(
                           obscureText: true,
                           decoration: InputDecoration(
-                            hintText: "Password",
+                            hintText: translate("password"), // Use translated text here
                             prefixIcon: const Icon(Icons.lock_outline),
                             filled: true,
                             fillColor: const Color(0xFFF4F4F4),
@@ -122,15 +142,16 @@ class LoginScreen extends StatelessWidget {
                                 ? const CircularProgressIndicator(
                               color: Colors.white,
                             )
-                                : const Text(
-                              "LOGIN",
-                              style: TextStyle(
+                                : Text(
+                              translate("login"), // Use translated text here
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
                           ),
                         )),
+
                       ],
                     ),
                   ),
@@ -140,11 +161,11 @@ class LoginScreen extends StatelessWidget {
                   // Signup link
                   TextButton(
                     onPressed: () {
-                      Get.to(RegisterScreen());
+                      Get.toNamed('/register');  // Navigate to register screen
                     },
-                    child: const Text(
-                      "Not yet registered? SignUp Now",
-                      style: TextStyle(
+                    child: Text(
+                      translate("notRegistered"),  // Use translated text here
+                      style: const TextStyle(
                         color: Color(0xFF6A1B9A),
                         fontSize: 14,
                       ),
