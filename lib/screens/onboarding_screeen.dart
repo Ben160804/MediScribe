@@ -56,6 +56,7 @@ class OnboardingScreen extends StatelessWidget {
               child: Obx(() => Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Skip Button
                   TextButton(
                     onPressed: controller.skip,
                     child: const Text(
@@ -66,8 +67,9 @@ class OnboardingScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  controller.currentPage.value ==
-                      controller.onboardingData.length - 1
+
+                  // Next or Get Started Button
+                  controller.currentPage.value == controller.onboardingData.length - 1
                       ? ElevatedButton(
                     onPressed: controller.nextPage,
                     style: ElevatedButton.styleFrom(
@@ -107,6 +109,7 @@ class OnboardingScreen extends StatelessWidget {
     );
   }
 
+  // Method to build the content for each page
   Widget _buildPageContent(String title, String description, String imagePath) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
