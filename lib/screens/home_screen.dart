@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../controllers/component_controllers/language_controller.dart';
-import '/controllers/component_controllers/image_controller.dart';
-import 'home_content.dart';
-import 'img_preview.dart';
+import 'package:aignite2025_oops/controllers/component_controllers/image_controller.dart';
+import 'package:aignite2025_oops/screens/home_content.dart';
+import 'package:aignite2025_oops/screens/img_preview.dart';
+import 'package:aignite2025_oops/screens/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -14,21 +15,24 @@ class HomeScreen extends StatelessWidget {
 
   final List<Widget> _screens = [
     const HomeContent(),
-    const Placeholder(), // Can be replaced with any screen or removed
+    const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final langController = Get.find<LanguageController>(); // Safe here
+    final langController = Get.find<LanguageController>();
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Obx(() => Text(
-          langController.selectedLanguage.value == 'bn'
-              ? 'হোম স্ক্রীন'
-              : 'Home Screen',
-        )),
+        title: Obx(() {
+          final isBengali = langController.selectedLanguage.value == 'bn';
+          final titles = [
+            isBengali ? 'হোম স্ক্রীন' : 'Home Screen',
+            isBengali ? 'প্রোফাইল' : 'Profile',
+          ];
+          return Text(titles[_selectedIndex.value]);
+        }),
         actions: [
           Obx(() {
             final isBengali = langController.selectedLanguage.value == 'bn';
@@ -56,13 +60,19 @@ class HomeScreen extends StatelessWidget {
             Get.find<ImageController>().pickImage(imageFile);
 
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(_getTranslatedText('Image captured successfully', langController))),
+              SnackBar(
+                content: Text(_getTranslatedText(
+                    'Image captured successfully', langController)),
+              ),
             );
 
             Get.to(() => ImagePreviewScreen());
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(_getTranslatedText('No image captured', langController))),
+              SnackBar(
+                content: Text(_getTranslatedText(
+                    'No image captured', langController)),
+              ),
             );
           }
         },
@@ -82,9 +92,19 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(icon: Icons.home, label: 'Home', index: 0, langController: langController),
+                _buildNavItem(
+                  icon: Icons.home,
+                  label: 'Home',
+                  index: 0,
+                  langController: langController,
+                ),
                 const SizedBox(width: 48),
-                _buildNavItem(icon: Icons.person, label: 'Profile', index: 1, langController: langController),
+                _buildNavItem(
+                  icon: Icons.person,
+                  label: 'Profile',
+                  index: 1,
+                  langController: langController,
+                ),
               ],
             ),
           ),
