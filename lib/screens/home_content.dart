@@ -45,6 +45,7 @@ class HomeContent extends StatelessWidget {
                   langController.selectedLanguage.value == 'bn'
                       ? 'পিডিএফ সফলভাবে নির্বাচিত হয়েছে'
                       : 'PDF selected successfully',
+                  style: GoogleFonts.roboto(),
                 ),
                 backgroundColor: const Color(0xFF7E57C2),
                 behavior: SnackBarBehavior.floating,
@@ -60,6 +61,7 @@ class HomeContent extends StatelessWidget {
                   langController.selectedLanguage.value == 'bn'
                       ? 'কোনো পিডিএফ নির্বাচন করা হয়নি'
                       : 'No PDF selected',
+                  style: GoogleFonts.roboto(),
                 ),
                 backgroundColor: Colors.red,
                 behavior: SnackBarBehavior.floating,
@@ -85,6 +87,7 @@ class HomeContent extends StatelessWidget {
                   langController.selectedLanguage.value == 'bn'
                       ? 'দয়া করে প্রথমে লগইন করুন'
                       : 'Please login first',
+                  style: GoogleFonts.roboto(),
                 ),
                 backgroundColor: Colors.red,
                 behavior: SnackBarBehavior.floating,
@@ -247,62 +250,58 @@ class HomeContent extends StatelessWidget {
   ) {
     return GestureDetector(
       onTap: feature.onTap,
-      child: Container(
-        width: double.infinity,
-        height: 130,
-        decoration: BoxDecoration(
-          color: feature.color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: feature.color.withOpacity(0.2), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: feature.color.withOpacity(0.1),
-              blurRadius: 8,
-              spreadRadius: 1,
-              offset: const Offset(0, 4),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          width: double.infinity,
+          height: 130,
+          decoration: BoxDecoration(
+            color: feature.color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: feature.color.withOpacity(0.2), width: 1),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: feature.color.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(feature.icon, size: 32, color: feature.color),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        feature.title,
+                        style: GoogleFonts.roboto(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        feature.subtitle,
+                        style: GoogleFonts.roboto(
+                          fontSize: subtitleFont,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios, size: 20, color: feature.color),
+              ],
             ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: feature.color.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(feature.icon, size: 32, color: feature.color),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      feature.title,
-                      style: GoogleFonts.roboto(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      feature.subtitle,
-                      style: GoogleFonts.roboto(
-                        fontSize: subtitleFont,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.arrow_forward_ios, size: 20, color: feature.color),
-            ],
           ),
         ),
       ),
