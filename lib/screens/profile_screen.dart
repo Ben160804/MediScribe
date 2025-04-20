@@ -58,13 +58,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: FutureBuilder<String>(
-          future: _getTranslatedText("Profile"),
-          builder: (context, snapshot) {
-            return Text(snapshot.data ?? "Profile");
-          },
+        title: Text(
+          "Profile",
+          style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color(0xFF7E57C2),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: Icon(_isBengali ? Icons.translate : Icons.translate_outlined),

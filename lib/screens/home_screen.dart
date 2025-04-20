@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../controllers/component_controllers/language_controller.dart';
 import '/controllers/component_controllers/image_controller.dart';
 import 'home_content.dart';
@@ -30,8 +31,12 @@ class HomeScreen extends StatelessWidget {
         title: Obx(
           () => Text(
             langController.selectedLanguage.value == 'bn'
-                ? 'হোম স্ক্রীন'
-                : 'Home Screen',
+                ? 'মেডিস্ক্রাইব'
+                : 'MediScribe',
+            style: GoogleFonts.roboto(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         actions: [
@@ -47,13 +52,14 @@ class HomeScreen extends StatelessWidget {
             );
           }),
         ],
-        backgroundColor: const Color(0xFF9575CD),
+        backgroundColor: const Color(0xFF7E57C2),
+        foregroundColor: Colors.white,
       ),
       body: Obx(() => _screens[_selectedIndex.value]),
       floatingActionButton:
           _selectedIndex.value == 0
               ? FloatingActionButton(
-                backgroundColor: const Color(0xFF9575CD),
+                backgroundColor: const Color(0xFF7E57C2),
                 onPressed: () async {
                   final picker = ImagePicker();
                   final pickedFile = await picker.pickImage(
@@ -72,6 +78,11 @@ class HomeScreen extends StatelessWidget {
                             langController,
                           ),
                         ),
+                        backgroundColor: const Color(0xFF7E57C2),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     );
 
@@ -85,11 +96,16 @@ class HomeScreen extends StatelessWidget {
                             langController,
                           ),
                         ),
+                        backgroundColor: Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     );
                   }
                 },
-                elevation: 8,
+                elevation: 4,
                 child: const Icon(Icons.add, color: Colors.white, size: 28),
               )
               : null,
@@ -98,11 +114,11 @@ class HomeScreen extends StatelessWidget {
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
         color: const Color(0xFFF3E5F5),
-        elevation: 8,
+        elevation: 4,
         child: SafeArea(
           top: false,
           child: SizedBox(
-            height: 48,
+            height: 56,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -149,13 +165,15 @@ class HomeScreen extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 26,
+              size: 28,
               color: isSelected ? const Color(0xFF7E57C2) : Colors.black54,
             ),
+            const SizedBox(height: 4),
             Text(
               translatedLabel,
-              style: TextStyle(
-                fontSize: 13,
+              style: GoogleFonts.roboto(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
                 color: isSelected ? const Color(0xFF7E57C2) : Colors.black54,
               ),
             ),

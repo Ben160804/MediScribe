@@ -7,6 +7,7 @@ import 'package:get_storage/get_storage.dart';
 import 'controllers/component_controllers/user_controller.dart';
 import 'firebase_options.dart';
 import 'translation/app_translations.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // Screens
 import 'screens/home_screen.dart';
@@ -50,7 +51,86 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'MediScribe',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF7E57C2),
+            brightness: Brightness.light,
+          ),
+          textTheme: GoogleFonts.robotoTextTheme(),
+          appBarTheme: const AppBarTheme(
+            elevation: 0,
+            centerTitle: true,
+            backgroundColor: Color(0xFF7E57C2),
+            foregroundColor: Colors.white,
+          ),
+          cardTheme: CardTheme(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              elevation: 2,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+          ),
+          floatingActionButtonTheme: const FloatingActionButtonThemeData(
+            elevation: 4,
+            backgroundColor: Color(0xFF7E57C2),
+          ),
+        ),
+        darkTheme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF7E57C2),
+            brightness: Brightness.dark,
+          ),
+          textTheme: GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme),
+          appBarTheme: const AppBarTheme(
+            elevation: 0,
+            centerTitle: true,
+            backgroundColor: Color(0xFF7E57C2),
+            foregroundColor: Colors.white,
+          ),
+          cardTheme: CardTheme(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              elevation: 2,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+          ),
+          floatingActionButtonTheme: const FloatingActionButtonThemeData(
+            elevation: 4,
+            backgroundColor: Color(0xFF7E57C2),
+          ),
         ),
         translations: AppTranslations(),
         locale:
@@ -58,7 +138,7 @@ class MyApp extends StatelessWidget {
                 ? Locale(langController.selectedLanguage.value)
                 : const Locale('en'),
         fallbackLocale: const Locale('en'),
-        initialRoute: '/language',
+        initialRoute: '/login',
         getPages: [
           GetPage(name: '/language', page: () => LanguageScreen()),
           GetPage(name: '/onboarding', page: () => OnboardingScreen()),

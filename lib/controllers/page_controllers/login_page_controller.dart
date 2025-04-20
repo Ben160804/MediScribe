@@ -1,44 +1,106 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../api/auth_api_service.dart';
 import '../../api/translater_api_service.dart';
 
-
 class LoginController extends GetxController {
-  var email     = ''.obs;
-  var password  = ''.obs;
-  var isLoading = false.obs;
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final emailError = RxString('');
+  final passwordError = RxString('');
+  final isLoading = false.obs;
+  final isPasswordVisible = false.obs;
 
   final AuthService _authService = AuthService();
 
-  Future<void> login() async {
-    // 1) Simple validation
-    if (email.value.trim().isEmpty || password.value.isEmpty) {
-      Get.snackbar('Error', 'Email and password cannot be empty');
-      return;
-    }
+  void togglePasswordVisibility() {
+    isPasswordVisible.value = !isPasswordVisible.value;
+  }
 
-    isLoading.value = true;
+  Future<bool> login() async {
+    if (!_validateInputs()) return false;
 
     try {
-      // 2) Delegate to AuthService
-      User user = await _authService.loginWithEmail(
-        email: email.value.trim(),
-        password: password.value,
+      isLoading.value = true;
+      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text,
       );
-    /*  String test = await  TranslationService().translate('home','bn');
-      print('test: ${test}');*/
-      // 3) On success
-      isLoading.value = false;
-      Get.snackbar('Welcome', 'Logged in as ${user.email}');
-      Get.offAllNamed('/home');
+
+      if (userCredential.user != null) {
+        // Update last login time
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .update({
+          'lastLogin': FieldValue.serverTimestamp(),
+        });
+        return true;
+      }
+      return false;
     } on FirebaseAuthException catch (e) {
-      // 4) Handle auth errors
+      _handleAuthError(e);
+      return false;
+    } finally {
       isLoading.value = false;
-      Get.snackbar('Login Failed', e.message ?? e.code);
-    } catch (e) {
-      isLoading.value = false;
-      Get.snackbar('Error', e.toString());
     }
+  }
+
+  bool _validateInputs() {
+    bool isValid = true;
+    emailError.value = '';
+    passwordError.value = '';
+
+    if (emailController.text.isEmpty) {
+      emailError.value = 'Email is required';
+      isValid = false;
+    } else if (!GetUtils.isEmail(emailController.text)) {
+      emailError.value = 'Please enter a valid email';
+      isValid = false;
+    }
+
+    if (passwordController.text.isEmpty) {
+      passwordError.value = 'Password is required';
+      isValid = false;
+    } else if (passwordController.text.length < 6) {
+      passwordError.value = 'Password must be at least 6 characters';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  void _handleAuthError(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
+        emailError.value = 'No user found with this email';
+        break;
+      case 'wrong-password':
+        passwordError.value = 'Wrong password provided';
+        break;
+      case 'invalid-email':
+        emailError.value = 'Invalid email address';
+        break;
+      case 'user-disabled':
+        emailError.value = 'This account has been disabled';
+        break;
+      default:
+        Get.snackbar(
+          'Error',
+          'An error occurred during login',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+    }
+  }
+
+  @override
+  void onClose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.onClose();
   }
 }

@@ -47,6 +47,10 @@ class HomeContent extends StatelessWidget {
                       : 'PDF selected successfully',
                 ),
                 backgroundColor: const Color(0xFF7E57C2),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             );
           } else {
@@ -58,6 +62,10 @@ class HomeContent extends StatelessWidget {
                       : 'No PDF selected',
                 ),
                 backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             );
           }
@@ -68,7 +76,7 @@ class HomeContent extends StatelessWidget {
         title: 'Previous Reports',
         subtitle: 'View your test history',
         icon: Icons.history,
-        color: const Color(0xFF6A1B9A),
+        color: const Color(0xFF7E57C2),
         onTap: () {
           if (FirebaseAuth.instance.currentUser == null) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -79,6 +87,10 @@ class HomeContent extends StatelessWidget {
                       : 'Please login first',
                 ),
                 backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             );
             return;
@@ -96,10 +108,10 @@ class HomeContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(titleFont, langController),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               ...features.map(
                 (f) => Padding(
-                  padding: const EdgeInsets.only(bottom: 28),
+                  padding: const EdgeInsets.only(bottom: 24),
                   child: _buildLargeFeatureTile(
                     context,
                     f,
@@ -130,13 +142,13 @@ class HomeContent extends StatelessWidget {
             style: GoogleFonts.roboto(
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: const Color(0xFF7E57C2),
             ),
           ),
           Builder(
             builder:
                 (context) => IconButton(
-                  icon: const Icon(Icons.more_vert, color: Color(0xFF9575CD)),
+                  icon: const Icon(Icons.more_vert, color: Color(0xFF7E57C2)),
                   onPressed: () {
                     final RenderBox button =
                         context.findRenderObject() as RenderBox;
@@ -171,6 +183,7 @@ class HomeContent extends StatelessWidget {
                                 langController.selectedLanguage.value == 'bn'
                                     ? 'সেটিংস'
                                     : 'Settings',
+                                style: GoogleFonts.roboto(),
                               ),
                             ],
                           ),
@@ -188,6 +201,7 @@ class HomeContent extends StatelessWidget {
                                 langController.selectedLanguage.value == 'bn'
                                     ? 'প্রোফাইল'
                                     : 'Profile',
+                                style: GoogleFonts.roboto(),
                               ),
                             ],
                           ),
@@ -205,6 +219,7 @@ class HomeContent extends StatelessWidget {
                                 langController.selectedLanguage.value == 'bn'
                                     ? 'লগআউট'
                                     : 'Log Out',
+                                style: GoogleFonts.roboto(),
                               ),
                             ],
                           ),
@@ -237,80 +252,61 @@ class HomeContent extends StatelessWidget {
         height: 130,
         decoration: BoxDecoration(
           color: feature.color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: feature.color.withOpacity(0.2), width: 1.2),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: feature.color.withOpacity(0.2), width: 1),
           boxShadow: [
             BoxShadow(
-              color: feature.color.withOpacity(0.3),
-              blurRadius: 12,
-              spreadRadius: 2,
-              offset: const Offset(0, 6),
+              color: feature.color.withOpacity(0.1),
+              blurRadius: 8,
+              spreadRadius: 1,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-        padding: EdgeInsets.all(tilePadding),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 32,
-              backgroundColor: feature.color,
-              child: Icon(feature.icon, color: Colors.white, size: 32),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _getTranslatedText(feature.id, feature.title),
-                    style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w600,
-                      fontSize: subtitleFont + 4,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    _getTranslatedSubtitle(feature.id, feature.subtitle),
-                    style: GoogleFonts.roboto(
-                      fontSize: subtitleFont,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: feature.color.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(feature.icon, size: 32, color: feature.color),
               ),
-            ),
-          ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      feature.title,
+                      style: GoogleFonts.roboto(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      feature.subtitle,
+                      style: GoogleFonts.roboto(
+                        fontSize: subtitleFont,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, size: 20, color: feature.color),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  String _getTranslatedText(String id, String defaultText) {
-    final lang = Get.find<LanguageController>().selectedLanguage.value;
-    if (lang == 'bn') {
-      switch (id) {
-        case 'select_report':
-          return 'গ্যালারি থেকে রিপোর্ট নির্বাচন করুন';
-        case 'previous_reports':
-          return 'পূর্ববর্তী রিপোর্ট';
-      }
-    }
-    return defaultText;
-  }
-
-  String _getTranslatedSubtitle(String id, String defaultText) {
-    final lang = Get.find<LanguageController>().selectedLanguage.value;
-    if (lang == 'bn') {
-      switch (id) {
-        case 'select_report':
-          return 'স্ক্যান করুন এবং তথ্য পান';
-        case 'previous_reports':
-          return 'আপনার পূর্বের রিপোর্ট অ্যাক্সেস করুন';
-      }
-    }
-    return defaultText;
   }
 }
 
@@ -322,7 +318,7 @@ class _Feature {
   final Color color;
   final VoidCallback onTap;
 
-  _Feature({
+  const _Feature({
     required this.id,
     required this.title,
     required this.subtitle,

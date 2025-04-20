@@ -14,10 +14,13 @@ class LabReportScreen extends StatefulWidget {
   State<LabReportScreen> createState() => _LabReportScreenState();
 }
 
-class _LabReportScreenState extends State<LabReportScreen> {
+class _LabReportScreenState extends State<LabReportScreen>
+    with SingleTickerProviderStateMixin {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late Map<String, List<LabResultEntry>> labHistory;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
@@ -26,6 +29,21 @@ class _LabReportScreenState extends State<LabReportScreen> {
     if (labHistory.isEmpty) {
       _fetchLabReports();
     }
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchLabReports() async {
@@ -74,12 +92,31 @@ class _LabReportScreenState extends State<LabReportScreen> {
     }
   }
 
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'normal':
+        return Colors.green;
+      case 'high':
+        return Colors.orange;
+      case 'low':
+        return Colors.blue;
+      case 'critical':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Lab Report Analysis"),
+        title: const Text(
+          "Lab Report Analysis",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
         backgroundColor: const Color(0xFF7E57C2),
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -88,68 +125,189 @@ class _LabReportScreenState extends State<LabReportScreen> {
           ),
         ],
       ),
-      body:
-          labHistory.isEmpty
-              ? const Center(
-                child: Text(
-                  'No lab reports found',
-                  style: TextStyle(fontSize: 18),
-                ),
-              )
-              : ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: labHistory.length,
-                itemBuilder: (context, index) {
-                  final testName = labHistory.keys.elementAt(index);
-                  final entries = labHistory[testName]!;
-
-                  // Sort entries by date in descending order (newest first)
-                  entries.sort((a, b) => b.date.compareTo(a.date));
-
-                  return Card(
-                    elevation: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ExpansionTile(
-                      title: Text(
-                        testName,
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child:
+            labHistory.isEmpty
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.medical_services_outlined,
+                        size: 64,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No lab reports found',
                         style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.bold,
                           fontSize: 18,
+                          color: Colors.grey[600],
                         ),
                       ),
-                      children:
-                          entries
-                              .map(
-                                (entry) => ListTile(
-                                  title: Text(
-                                    "Date: ${entry.date.day}/${entry.date.month}/${entry.date.year}",
-                                    style: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w500,
+                      const SizedBox(height: 8),
+                      Text(
+                        'Upload a new report or check back later',
+                        style: GoogleFonts.roboto(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: labHistory.length,
+                  itemBuilder: (context, index) {
+                    final testName = labHistory.keys.elementAt(index);
+                    final entries = labHistory[testName]!;
+
+                    // Sort entries by date in descending order (newest first)
+                    entries.sort((a, b) => b.date.compareTo(a.date));
+
+                    return Card(
+                      elevation: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ExpansionTile(
+                        title: Text(
+                          testName,
+                          style: GoogleFonts.roboto(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        leading: CircleAvatar(
+                          backgroundColor: _getStatusColor(
+                            entries.first.status,
+                          ),
+                          child: Icon(
+                            Icons.medical_services,
+                            color: Colors.white,
+                          ),
+                        ),
+                        children:
+                            entries
+                                .map(
+                                  (entry) => Container(
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.grey[200]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: ListTile(
+                                      title: Text(
+                                        "Date: ${entry.date.day}/${entry.date.month}/${entry.date.year}",
+                                        style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.science,
+                                                size: 16,
+                                                color: _getStatusColor(
+                                                  entry.status,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                "Value: ${entry.value} ${entry.unit ?? ''}",
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.trending_up,
+                                                size: 16,
+                                                color: Colors.blue,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                "Normal Range: ${entry.normalRange}",
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.info_outline,
+                                                size: 16,
+                                                color: _getStatusColor(
+                                                  entry.status,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                "Status: ${entry.status}",
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: 14,
+                                                  color: _getStatusColor(
+                                                    entry.status,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          if (entry.notes != null &&
+                                              entry.notes!.isNotEmpty) ...[
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Icon(
+                                                  Icons.note,
+                                                  size: 16,
+                                                  color: Colors.orange,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    "Notes: ${entry.notes}",
+                                                    style: GoogleFonts.roboto(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                          const SizedBox(height: 8),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Value: ${entry.value} ${entry.unit ?? ''}",
-                                      ),
-                                      Text(
-                                        "Normal Range: ${entry.normalRange}",
-                                      ),
-                                      Text("Status: ${entry.status}"),
-                                      if (entry.notes != null &&
-                                          entry.notes!.isNotEmpty)
-                                        Text("Notes: ${entry.notes}"),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                    ),
-                  );
-                },
-              ),
+                                )
+                                .toList(),
+                      ),
+                    );
+                  },
+                ),
+      ),
     );
   }
 }
