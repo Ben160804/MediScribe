@@ -3,10 +3,7 @@ import 'package:aignite2025_oops/screens/onboarding_screeen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
-
 import 'package:get_storage/get_storage.dart';
-import 'controllers/component_controllers/user_controller.dart';
-
 import 'controllers/component_controllers/user_controller.dart';
 import 'firebase_options.dart';
 import 'translation/app_translations.dart';
@@ -15,7 +12,6 @@ import 'translation/app_translations.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
-  // Fixed typo in the screen name
 
 // Controllers
 import 'controllers/component_controllers/pdf_controller.dart';
@@ -26,9 +22,7 @@ import 'controllers/page_controllers/register_page_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Initialize GetStorage before running the app
   await GetStorage.init();
@@ -52,19 +46,19 @@ class MyApp extends StatelessWidget {
     final LanguageController langController = Get.find();
 
     return Obx(() {
-      // Ensure the language is set properly when the app is launched
       return GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'MediScribe',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),
-        translations: AppTranslations(),  // i18n map
-        locale: langController.selectedLanguage.isNotEmpty
-            ? Locale(langController.selectedLanguage.value)  // dynamically set
-            : const Locale('en'),  // fallback
+        translations: AppTranslations(),
+        locale:
+            langController.selectedLanguage.isNotEmpty
+                ? Locale(langController.selectedLanguage.value)
+                : const Locale('en'),
         fallbackLocale: const Locale('en'),
-        initialRoute: '/login',  // Initial screen for language selection
+        initialRoute: '/language',
         getPages: [
           GetPage(name: '/language', page: () => LanguageScreen()),
           GetPage(name: '/onboarding', page: () => OnboardingScreen()),

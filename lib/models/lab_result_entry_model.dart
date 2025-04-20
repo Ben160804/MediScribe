@@ -1,39 +1,62 @@
 class LabResultEntry {
-  final double value;
+  final DateTime date;
+  final String value;
+  final String? unit;
   final String normalRange;
   final String status;
-  final DateTime date;
-  final String? unit;
   final String? notes;
 
   LabResultEntry({
+    required this.date,
     required this.value,
+    this.unit,
     required this.normalRange,
     required this.status,
-    required this.date,
-    this.unit,
     this.notes,
   });
 
-  Map<String, dynamic> toMap() {
+  factory LabResultEntry.fromJson(Map<String, dynamic> json) {
+    return LabResultEntry(
+      date: DateTime.parse(json['date']),
+      value: json['value'].toString(),
+      unit: json['unit'],
+      normalRange: json['normalRange'],
+      status: json['status'],
+      notes: json['notes'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
     return {
+      'date': date.toIso8601String(),
       'value': value,
+      'unit': unit,
       'normalRange': normalRange,
       'status': status,
-      'date': date.toIso8601String(),
-      if (unit != null) 'unit': unit,
-      if (notes != null) 'notes': notes,
+      'notes': notes,
     };
   }
 
+  // For backward compatibility
   factory LabResultEntry.fromMap(Map<String, dynamic> map) {
     return LabResultEntry(
-      value: (map['value'] as num).toDouble(),
-      normalRange: map['normalRange'] as String,
-      status: map['status'] as String,
-      date: DateTime.parse(map['date'] as String),
-      unit: map['unit'] as String?,
-      notes: map['notes'] as String?,
+      date: DateTime.parse(map['date']),
+      value: map['value'].toString(),
+      unit: map['unit'],
+      normalRange: map['normalRange'],
+      status: map['status'],
+      notes: map['notes'],
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'date': date.toIso8601String(),
+      'value': value,
+      'unit': unit,
+      'normalRange': normalRange,
+      'status': status,
+      'notes': notes,
+    };
   }
 }

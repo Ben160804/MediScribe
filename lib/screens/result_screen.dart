@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../services/translation_service.dart';
+import '../screens/profile_screen.dart';
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
@@ -99,6 +100,22 @@ class _ResultScreenState extends State<ResultScreen> {
     return user.summary[testType] ?? {};
   }
 
+  double _calculateMinValue(List<String> values) {
+    return values
+        .map((v) => double.tryParse(v) ?? 0.0)
+        .reduce((a, b) => a < b ? a : b);
+  }
+
+  double _calculateMaxValue(List<String> values) {
+    return values
+        .map((v) => double.tryParse(v) ?? 0.0)
+        .reduce((a, b) => a > b ? a : b);
+  }
+
+  double _calculateRange(double maxValue, double minValue) {
+    return maxValue - minValue;
+  }
+
   Widget _buildTestGraph(String testName, List<LabResultEntry> entries) {
     // Sort entries by date
     final sortedEntries = entries.toList();
@@ -106,9 +123,9 @@ class _ResultScreenState extends State<ResultScreen> {
 
     // Extract values for the graph
     final values = sortedEntries.map((e) => e.value).toList();
-    final minValue = values.reduce((a, b) => a < b ? a : b);
-    final maxValue = values.reduce((a, b) => a > b ? a : b);
-    final range = maxValue - minValue;
+    final minValue = _calculateMinValue(values);
+    final maxValue = _calculateMaxValue(values);
+    final range = _calculateRange(maxValue, minValue);
     final padding = range * 0.1; // 10% padding
 
     return Card(
@@ -196,7 +213,7 @@ class _ResultScreenState extends State<ResultScreen> {
                         sortedEntries.length,
                         (index) => FlSpot(
                           index.toDouble(),
-                          sortedEntries[index].value,
+                          double.parse(sortedEntries[index].value),
                         ),
                       ),
                       isCurved: true,
@@ -248,6 +265,104 @@ class _ResultScreenState extends State<ResultScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            FutureBuilder<Map<String, dynamic>>(
+              future: _userFuture.then((user) => user?.summary[testName] ?? {}),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  final summary = snapshot.data!;
+                  final consultation = summary['doctorConsultation'];
+
+                  if (consultation != null) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FutureBuilder<String>(
+                          future: _getTranslatedText("Doctor's Recommendation"),
+                          builder: (context, snapshot) {
+                            return Text(
+                              snapshot.data ?? "Doctor's Recommendation",
+                              style: GoogleFonts.roboto(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        if (consultation['recommended'] == true)
+                          FutureBuilder<String>(
+                            future: _getTranslatedText(
+                              "Consultation Recommended",
+                            ),
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.data ?? "Consultation Recommended",
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  color: Colors.green,
+                                ),
+                              );
+                            },
+                          ),
+                        if (consultation['reason'] != null &&
+                            consultation['reason'].isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          FutureBuilder<String>(
+                            future: _getTranslatedText(
+                              "Reason: ${consultation['reason']}",
+                            ),
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.data ??
+                                    "Reason: ${consultation['reason']}",
+                                style: GoogleFonts.roboto(fontSize: 14),
+                              );
+                            },
+                          ),
+                        ],
+                        if (consultation['questions'] != null &&
+                            consultation['questions'].isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          FutureBuilder<String>(
+                            future: _getTranslatedText("Questions to Discuss:"),
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.data ?? "Questions to Discuss:",
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 4),
+                          ...(consultation['questions'] as List).map(
+                            (question) => Padding(
+                              padding: const EdgeInsets.only(
+                                left: 16,
+                                bottom: 4,
+                              ),
+                              child: FutureBuilder<String>(
+                                future: _getTranslatedText(question),
+                                builder: (context, snapshot) {
+                                  return Text(
+                                    "• ${snapshot.data ?? question}",
+                                    style: GoogleFonts.roboto(fontSize: 14),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    );
+                  }
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ],
         ),
       ),
@@ -255,22 +370,23 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   String _calculateTrend(List<LabResultEntry> entries) {
-    if (entries.length < 2) return 'stable';
+    if (entries.length < 2) return 'Insufficient data';
 
     final recentValues = entries.sublist(entries.length - 2);
-    final difference = recentValues[1].value - recentValues[0].value;
-    final percentageChange = (difference / recentValues[0].value) * 100;
+    final value1 = double.parse(recentValues[0].value);
+    final value2 = double.parse(recentValues[1].value);
+    final difference = value2 - value1;
 
-    if (percentageChange > 5) return 'improving';
-    if (percentageChange < -5) return 'worsening';
-    return 'stable';
+    if (difference > 0) return 'Increasing';
+    if (difference < 0) return 'Decreasing';
+    return 'Stable';
   }
 
   Color _getTrendColor(String trend) {
     switch (trend.toLowerCase()) {
-      case 'improving':
+      case 'increasing':
         return Colors.green;
-      case 'worsening':
+      case 'decreasing':
         return Colors.red;
       case 'stable':
         return Colors.blue;
@@ -291,6 +407,13 @@ class _ResultScreenState extends State<ResultScreen> {
         ),
         backgroundColor: const Color(0xFF7E57C2),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Get.to(() => const ProfileScreen());
+            },
+            tooltip: "View Profile",
+          ),
           IconButton(
             icon: Icon(_isBengali ? Icons.translate : Icons.translate_outlined),
             onPressed: _toggleTranslation,

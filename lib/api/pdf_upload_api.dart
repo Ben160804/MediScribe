@@ -83,7 +83,7 @@ Future<void> updateUserLabReport(Map<String, dynamic> labReport) async {
           for (var entry in entries) {
             testEntries.add(
               LabResultEntry(
-                value: (entry['value'] as num).toDouble(),
+                value: (entry['value'] as num).toString(),
                 normalRange:
                     "${entry['normalRange'][0]} - ${entry['normalRange'][1]}",
                 status: entry['status'],
@@ -149,6 +149,55 @@ Future<void> updateUserLabReport(Map<String, dynamic> labReport) async {
   } catch (e) {
     print("Error updating user's lab report: $e");
   }
+}
+
+Future<Map<String, List<LabResultEntry>>> _parseLabResults(
+  Map<String, dynamic> data,
+) async {
+  final Map<String, List<LabResultEntry>> labHistory = {};
+
+  for (var entry in data.entries) {
+    final testName = entry.key;
+    final entries =
+        (entry.value as List)
+            .map((e) => LabResultEntry.fromMap(e as Map<String, dynamic>))
+            .toList()
+            .cast<LabResultEntry>();
+
+    labHistory[testName] = entries;
+  }
+
+  return labHistory;
+}
+
+LabResultEntry _createLabResultEntry(Map<String, dynamic> entry) {
+  return LabResultEntry(
+    date: DateTime.parse(entry['date']),
+    value: entry['value'].toString(),
+    unit: entry['unit'],
+    normalRange: entry['normalRange'],
+    status: entry['status'],
+    notes: entry['notes'],
+  );
+}
+
+Map<String, List<LabResultEntry>> _convertLabHistory(
+  Map<String, dynamic> data,
+) {
+  final Map<String, List<LabResultEntry>> converted = {};
+
+  for (var entry in data.entries) {
+    final testName = entry.key;
+    final entries =
+        (entry.value as List)
+            .map((e) => _createLabResultEntry(e as Map<String, dynamic>))
+            .toList()
+            .cast<LabResultEntry>();
+
+    converted[testName] = entries;
+  }
+
+  return converted;
 }
 
 // Upload PDF and process the response
@@ -245,7 +294,7 @@ Future<http.Response?> uploadPdf(File pdfFile) async {
                       entries
                           .map(
                             (entry) => LabResultEntry(
-                              value: (entry['value'] as num).toDouble(),
+                              value: (entry['value'] as num).toString(),
                               normalRange:
                                   "${entry['normalRange'][0]} - ${entry['normalRange'][1]}",
                               status: entry['status'],

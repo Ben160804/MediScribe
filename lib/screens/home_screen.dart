@@ -6,6 +6,8 @@ import '../controllers/component_controllers/language_controller.dart';
 import '/controllers/component_controllers/image_controller.dart';
 import 'home_content.dart';
 import 'img_preview.dart';
+import 'profile_screen.dart';
+import 'result_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -14,21 +16,24 @@ class HomeScreen extends StatelessWidget {
 
   final List<Widget> _screens = [
     const HomeContent(),
-    const Placeholder(), // Can be replaced with any screen or removed
+    const ResultScreen(),
+    const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final langController = Get.find<LanguageController>(); // Safe here
+    final langController = Get.find<LanguageController>();
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Obx(() => Text(
-          langController.selectedLanguage.value == 'bn'
-              ? 'হোম স্ক্রীন'
-              : 'Home Screen',
-        )),
+        title: Obx(
+          () => Text(
+            langController.selectedLanguage.value == 'bn'
+                ? 'হোম স্ক্রীন'
+                : 'Home Screen',
+          ),
+        ),
         actions: [
           Obx(() {
             final isBengali = langController.selectedLanguage.value == 'bn';
@@ -45,30 +50,49 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF9575CD),
       ),
       body: Obx(() => _screens[_selectedIndex.value]),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF9575CD),
-        onPressed: () async {
-          final picker = ImagePicker();
-          final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      floatingActionButton:
+          _selectedIndex.value == 0
+              ? FloatingActionButton(
+                backgroundColor: const Color(0xFF9575CD),
+                onPressed: () async {
+                  final picker = ImagePicker();
+                  final pickedFile = await picker.pickImage(
+                    source: ImageSource.camera,
+                  );
 
-          if (pickedFile != null) {
-            final imageFile = File(pickedFile.path);
-            Get.find<ImageController>().pickImage(imageFile);
+                  if (pickedFile != null) {
+                    final imageFile = File(pickedFile.path);
+                    Get.find<ImageController>().pickImage(imageFile);
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(_getTranslatedText('Image captured successfully', langController))),
-            );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          _getTranslatedText(
+                            'Image captured successfully',
+                            langController,
+                          ),
+                        ),
+                      ),
+                    );
 
-            Get.to(() => ImagePreviewScreen());
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(_getTranslatedText('No image captured', langController))),
-            );
-          }
-        },
-        elevation: 8,
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
-      ),
+                    Get.to(() => ImagePreviewScreen());
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          _getTranslatedText(
+                            'No image captured',
+                            langController,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                },
+                elevation: 8,
+                child: const Icon(Icons.add, color: Colors.white, size: 28),
+              )
+              : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -82,9 +106,24 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(icon: Icons.home, label: 'Home', index: 0, langController: langController),
-                const SizedBox(width: 48),
-                _buildNavItem(icon: Icons.person, label: 'Profile', index: 1, langController: langController),
+                _buildNavItem(
+                  icon: Icons.home,
+                  label: 'Home',
+                  index: 0,
+                  langController: langController,
+                ),
+                _buildNavItem(
+                  icon: Icons.bar_chart,
+                  label: 'Results',
+                  index: 1,
+                  langController: langController,
+                ),
+                _buildNavItem(
+                  icon: Icons.person,
+                  label: 'Profile',
+                  index: 2,
+                  langController: langController,
+                ),
               ],
             ),
           ),
@@ -133,6 +172,8 @@ class HomeScreen extends StatelessWidget {
       switch (text) {
         case 'Home':
           return 'বাড়ি';
+        case 'Results':
+          return 'ফলাফল';
         case 'Profile':
           return 'প্রোফাইল';
         case 'Image captured successfully':
