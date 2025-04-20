@@ -71,23 +71,27 @@ class UserModel {
 class DoctorConsultation {
   final bool recommended;
   final String reason;
+  final List<String> questions;
 
   DoctorConsultation({
     required this.recommended,
     required this.reason,
-  });
+    List<String>? questions,
+  }) : questions = questions ?? [];
 
   Map<String, dynamic> toMap() {
     return {
       'recommended': recommended,
       'reason': reason,
+      'questions': questions,
     };
   }
 
   factory DoctorConsultation.fromMap(Map<String, dynamic> map) {
     return DoctorConsultation(
-      recommended: map['recommended'] ?? false,
-      reason: map['reason'] ?? '',
+      recommended: map['recommended'] as bool? ?? false,
+      reason: map['reason'] as String? ?? '',
+      questions: List<String>.from(map['questions'] as List<dynamic>? ?? []),
     );
   }
 }

@@ -3,7 +3,11 @@ import 'package:aignite2025_oops/screens/onboarding_screeen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'package:get_storage/get_storage.dart';
+import 'controllers/component_controllers/user_controller.dart';
+
+import 'controllers/component_controllers/user_controller.dart';
 import 'firebase_options.dart';
 import 'translation/app_translations.dart';
 
@@ -35,6 +39,7 @@ void main() async {
   Get.put(LanguageController());
   Get.put(LoginController());
   Get.put(RegisterController());
+  Get.put(UserController());
 
   runApp(const MyApp());
 }
@@ -59,7 +64,7 @@ class MyApp extends StatelessWidget {
             ? Locale(langController.selectedLanguage.value)  // dynamically set
             : const Locale('en'),  // fallback
         fallbackLocale: const Locale('en'),
-        initialRoute: '/language',  // Initial screen for language selection
+        initialRoute: '/home',  // Initial screen for language selection
         getPages: [
           GetPage(name: '/language', page: () => LanguageScreen()),
           GetPage(name: '/onboarding', page: () => OnboardingScreen()),

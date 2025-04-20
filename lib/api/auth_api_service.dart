@@ -75,6 +75,7 @@ class AuthService {
     return _auth.currentUser;
   }
 
+
  /* /// Fetch user data from Firestore
   Future<UserModel?> fetchUserData(String uid) async {
     final doc = await _usersRef.doc(uid).get();
