@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 
 class ApiService {
-  final String uploadUrl = 'https://your-api-endpoint.com/upload'; // Replace with your actual API
+  final String uploadUrl = 'https://backend-mediscribe.onrender.com/upload'; // Replace with your actual API
 
   Future<http.Response?> uploadImage(File imageFile) async {
     try {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../api/pdf_upload_api.dart';
 import '../controllers/component_controllers/pdf_controller.dart';
 
 class PdfPreviewScreen extends StatefulWidget {
@@ -33,7 +34,6 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
             color: Colors.white,
           ),
         ),
-        automaticallyImplyLeading: true, // Uses device back button
       ),
       body: pdfFile != null
           ? Column(
@@ -73,25 +73,34 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       },
                     ),
                     if (isLoading)
-                      const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                      const Center(child: CircularProgressIndicator()),
                   ],
                 ),
               ),
             ),
           ),
-
-          // Analyze Button
           Padding(
             padding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // TODO: Trigger API call
-                  print("Analyzing PDF...");
+                onPressed: () async {
+                  if (pdfFile != null) {
+                    Get.snackbar("Uploading", "Analyzing PDF...",
+                        snackPosition: SnackPosition.BOTTOM);
+
+                    final response = await uploadPdf(pdfFile);
+
+                    if (response != null) {
+                      Get.snackbar("Success", "PDF uploaded successfully",
+                          snackPosition: SnackPosition.BOTTOM);
+                      print(response.body);
+                    } else {
+                      Get.snackbar("Error", "Failed to upload PDF",
+                          snackPosition: SnackPosition.BOTTOM);
+                    }
+                  }
                 },
                 icon: const Icon(Icons.analytics),
                 label: Text(

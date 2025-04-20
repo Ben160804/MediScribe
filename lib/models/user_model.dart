@@ -8,8 +8,13 @@ class UserModel {
   final String phone;
   final int age;
 
-  /// Map from test name (e.g., "Calcium", "Thyroid") to list of results
   final Map<String, List<LabResultEntry>> labHistory;
+
+  /// Summary per test (e.g., trend, latest value, status)
+  final Map<String, dynamic> summary;
+
+  /// Doctor consultation recommendation
+  final DoctorConsultation? doctorConsultation;
 
   UserModel({
     required this.id,
@@ -18,7 +23,10 @@ class UserModel {
     required this.phone,
     required this.age,
     Map<String, List<LabResultEntry>>? labHistory,
-  }) : labHistory = labHistory ?? {};
+    Map<String, dynamic>? summary,
+    this.doctorConsultation,
+  })  : labHistory = labHistory ?? {},
+        summary = summary ?? {};
 
   Map<String, dynamic> toMap() {
     return {
@@ -30,6 +38,8 @@ class UserModel {
         test,
         entries.map((e) => e.toMap()).toList(),
       )),
+      'summary': summary,
+      'doctorConsultation': doctorConsultation?.toMap(),
     };
   }
 
@@ -50,6 +60,34 @@ class UserModel {
       phone: data['phone'] ?? '',
       age: (data['age'] as num?)?.toInt() ?? 0,
       labHistory: parsedLab,
+      summary: (data['summary'] as Map<String, dynamic>? ?? {}),
+      doctorConsultation: data['doctorConsultation'] != null
+          ? DoctorConsultation.fromMap(data['doctorConsultation'])
+          : null,
+    );
+  }
+}
+
+class DoctorConsultation {
+  final bool recommended;
+  final String reason;
+
+  DoctorConsultation({
+    required this.recommended,
+    required this.reason,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'recommended': recommended,
+      'reason': reason,
+    };
+  }
+
+  factory DoctorConsultation.fromMap(Map<String, dynamic> map) {
+    return DoctorConsultation(
+      recommended: map['recommended'] ?? false,
+      reason: map['reason'] ?? '',
     );
   }
 }
