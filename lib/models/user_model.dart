@@ -13,6 +13,9 @@ class UserModel {
   /// Summary per test (e.g., trend, latest value, status)
   final Map<String, dynamic> summary;
 
+  /// Getter for labResults (alias for labHistory)
+  Map<String, List<LabResultEntry>> get labResults => labHistory;
+
   /// Doctor consultation recommendation
   final DoctorConsultation? doctorConsultation;
 
@@ -25,8 +28,8 @@ class UserModel {
     Map<String, List<LabResultEntry>>? labHistory,
     Map<String, dynamic>? summary,
     this.doctorConsultation,
-  })  : labHistory = labHistory ?? {},
-        summary = summary ?? {};
+  }) : labHistory = labHistory ?? {},
+       summary = summary ?? {};
 
   Map<String, dynamic> toMap() {
     return {
@@ -34,10 +37,10 @@ class UserModel {
       'email': email,
       'phone': phone,
       'age': age,
-      'labHistory': labHistory.map((test, entries) => MapEntry(
-        test,
-        entries.map((e) => e.toMap()).toList(),
-      )),
+      'labHistory': labHistory.map(
+        (test, entries) =>
+            MapEntry(test, entries.map((e) => e.toMap()).toList()),
+      ),
       'summary': summary,
       'doctorConsultation': doctorConsultation?.toMap(),
     };
@@ -47,9 +50,10 @@ class UserModel {
     final data = doc.data() as Map<String, dynamic>;
     final rawLab = data['labHistory'] as Map<String, dynamic>? ?? {};
     final parsedLab = rawLab.map((test, rawEntries) {
-      final list = (rawEntries as List)
-          .map((e) => LabResultEntry.fromMap(e as Map<String, dynamic>))
-          .toList();
+      final list =
+          (rawEntries as List)
+              .map((e) => LabResultEntry.fromMap(e as Map<String, dynamic>))
+              .toList();
       return MapEntry(test, list);
     });
 
@@ -61,9 +65,10 @@ class UserModel {
       age: (data['age'] as num?)?.toInt() ?? 0,
       labHistory: parsedLab,
       summary: (data['summary'] as Map<String, dynamic>? ?? {}),
-      doctorConsultation: data['doctorConsultation'] != null
-          ? DoctorConsultation.fromMap(data['doctorConsultation'])
-          : null,
+      doctorConsultation:
+          data['doctorConsultation'] != null
+              ? DoctorConsultation.fromMap(data['doctorConsultation'])
+              : null,
     );
   }
 }

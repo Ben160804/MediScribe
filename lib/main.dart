@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
             ? Locale(langController.selectedLanguage.value)  // dynamically set
             : const Locale('en'),  // fallback
         fallbackLocale: const Locale('en'),
-        initialRoute: '/home',  // Initial screen for language selection
+        initialRoute: '/login',  // Initial screen for language selection
         getPages: [
           GetPage(name: '/language', page: () => LanguageScreen()),
           GetPage(name: '/onboarding', page: () => OnboardingScreen()),

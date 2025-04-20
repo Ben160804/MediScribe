@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../models/lab_result_entry_model.dart';
 
 class LabReportScreen extends StatelessWidget {
-  final Map<String, dynamic> labHistory;
+  final Map<String, List<LabResultEntry>> labHistory;
 
   const LabReportScreen({super.key, required this.labHistory});
 
@@ -19,12 +20,15 @@ class LabReportScreen extends StatelessWidget {
         itemCount: labHistory.length,
         itemBuilder: (context, index) {
           final testName = labHistory.keys.elementAt(index);
-          final testDetails = labHistory[testName][0]; // only showing first entry
+          final entries = labHistory[testName]!;
+
+          // Sort entries by date in descending order (newest first)
+          entries.sort((a, b) => b.date.compareTo(a.date));
 
           return Card(
             elevation: 4,
             margin: const EdgeInsets.symmetric(vertical: 8),
-            child: ListTile(
+            child: ExpansionTile(
               title: Text(
                 testName,
                 style: GoogleFonts.roboto(
@@ -32,17 +36,30 @@ class LabReportScreen extends StatelessWidget {
                   fontSize: 18,
                 ),
               ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Value: ${testDetails['value']}"),
-                    Text("Normal Range: ${testDetails['normalRange'][0]} - ${testDetails['normalRange'][1]}"),
-                    Text("Status: ${testDetails['status']}"),
-                  ],
-                ),
-              ),
+              children:
+                  entries
+                      .map(
+                        (entry) => ListTile(
+                          title: Text(
+                            "Date: ${entry.date.day}/${entry.date.month}/${entry.date.year}",
+                            style: GoogleFonts.roboto(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Value: ${entry.value} ${entry.unit ?? ''}"),
+                              Text("Normal Range: ${entry.normalRange}"),
+                              Text("Status: ${entry.status}"),
+                              if (entry.notes != null &&
+                                  entry.notes!.isNotEmpty)
+                                Text("Notes: ${entry.notes}"),
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList(),
             ),
           );
         },

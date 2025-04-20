@@ -1,27 +1,39 @@
 class LabResultEntry {
   final double value;
-  final String status; // e.g., "low", "normal", "high"
-  final String normalRange; // e.g., "8.5 - 10.5"
+  final String normalRange;
+  final String status;
+  final DateTime date;
+  final String? unit;
+  final String? notes;
 
   LabResultEntry({
     required this.value,
-    required this.status,
     required this.normalRange,
+    required this.status,
+    required this.date,
+    this.unit,
+    this.notes,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'value': value,
-      'status': status,
       'normalRange': normalRange,
+      'status': status,
+      'date': date.toIso8601String(),
+      if (unit != null) 'unit': unit,
+      if (notes != null) 'notes': notes,
     };
   }
 
   factory LabResultEntry.fromMap(Map<String, dynamic> map) {
     return LabResultEntry(
       value: (map['value'] as num).toDouble(),
-      status: map['status'] ?? 'unknown',
-      normalRange: map['normalRange'] ?? '',
+      normalRange: map['normalRange'] as String,
+      status: map['status'] as String,
+      date: DateTime.parse(map['date'] as String),
+      unit: map['unit'] as String?,
+      notes: map['notes'] as String?,
     );
   }
 }
